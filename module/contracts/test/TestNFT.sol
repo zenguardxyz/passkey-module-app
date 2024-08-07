@@ -3,7 +3,7 @@ pragma solidity >=0.8.12 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract SafePassKeyNFT is ERC721 {
+contract ZenGuardHHGoa is ERC721 {
 
   constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
 

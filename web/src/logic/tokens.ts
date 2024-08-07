@@ -4,6 +4,8 @@ import ETH from '../assets/icons/eth.svg';
 import Gnosis from '../assets/icons/gno.svg';
 import Matic from '../assets/icons/matic.svg';
 import USDT from '../assets/icons/usdt.svg';
+import ZMUG from '../assets/icons/ZMUG.svg';
+import ZSHIRT from '../assets/icons/ZSHIRT.svg';
 
 
 export const badgeIcons = [
@@ -42,7 +44,19 @@ export const tokenList: any = {
         image: 
          'https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/svg/color/usdc.svg',
         description: 'USDC stablecoin',
-      },                                                                                                    
+      },
+      {
+        value: '0x3603033F35F295eDAd34d13A13628bdE247653D6',
+        label: 'ZMUG',
+        image: ZMUG,
+        description: 'ZenGuard Mug Token',
+      },  
+      {
+        value: '0x31F7F5E3f937AC60ABeA894F39e93d350FEb5937',
+        label: 'ZSHIRT',
+        image: ZSHIRT,
+        description: 'ZenGuard Shirt Token',
+      },                                                                                                      
                                                                                                  
 
   ],
@@ -123,6 +137,18 @@ export const tokenList: any = {
         label: 'OST',
         image: Base,
         description: 'Onchain Summer Token',
+      },
+      {
+        value: '0x3603033F35F295eDAd34d13A13628bdE247653D6',
+        label: 'ZMUG',
+        image: ZMUG,
+        description: 'ZenGuard Mug Token',
+      },  
+      {
+        value: '0x31F7F5E3f937AC60ABeA894F39e93d350FEb5937',
+        label: 'ZSHIRT',
+        image: ZSHIRT,
+        description: 'ZenGuard Shirt Token',
       },     
 
   ],

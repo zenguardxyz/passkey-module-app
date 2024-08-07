@@ -21,7 +21,7 @@ import { ENTRYPOINT_ADDRESS_V07_TYPE } from "permissionless/types/entrypoint";
 
 
 const webAuthnModule = "0xD990393C670dCcE8b4d8F858FB98c9912dBFAa06"
-export const safePassKeyNFT = "0x18533043A3c158d97587d4Fb53E7E163a692E8CE"
+export const safePassKeyNFT = "0x0b4532B216D7c961356a9D1dD3FD25dB1FDCd294"
 
 
 export function generateRandomString(length: number) {

@@ -128,3 +128,12 @@ background: linear-gradient(to left, #00FF00 0%, #00FFFF 100%);
   display: flex;
   flex-direction: column;
 }
+
+
+.card {
+  position: relative;
+  overflow: visible;
+  padding: var(--mantine-spacing-xl);
+  width: 100%;
+  /* padding-top: calc(var(--mantine-spacing-xl) * 1.5 + rem(20px)); */
+}

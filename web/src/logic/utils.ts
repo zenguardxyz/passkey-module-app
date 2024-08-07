@@ -65,7 +65,6 @@ export async function getTokenBalance(tokenAddress: string, account: string, pro
 
   // Get the balance using the balanceOf function
   const balance = await tokenContract.balanceOf(account);
-  console.log(balance)
   const decimals = await tokenContract.decimals()
 
   return formatUnits(balance, decimals);

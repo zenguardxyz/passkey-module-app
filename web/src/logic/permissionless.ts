@@ -31,8 +31,8 @@ export type SafeSmartAccountClient = SmartAccountClient<
   }
   
 
-const safe4337ModuleAddress = '0x3Fdb5BC686e861480ef99A6E3FaAe03c0b9F32e2'
-const erc7569LaunchpadAddress = '0xEBe001b3D534B9B6E2500FB78E67a1A137f561CE'
+const safe4337ModuleAddress = '0x6572f74fb630cfe9132143dd4007ddd013e40f83'
+const erc7569LaunchpadAddress = '0xd882cdf813e9d34a52587afb0f32ad01eb78f8d0'
 
 
 

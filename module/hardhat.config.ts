@@ -99,6 +99,10 @@ const userConfig: HardhatUserConfig = {
       ...sharedNetworkConfig,
       url: `https://polygon-mainnet.infura.io/v3/${INFURA_KEY}`,
     },
+    base: {
+      ...sharedNetworkConfig,
+      url: `https://base-mainnet.g.alchemy.com/v2/wRVILABVfp0WrfAv449B23mIW_SJqOwL`,
+    },
     sepolia: {
       ...sharedNetworkConfig,
       url: `https://sepolia.infura.io/v3/${INFURA_KEY}`,

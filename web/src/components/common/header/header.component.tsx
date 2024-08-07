@@ -11,7 +11,7 @@ import {
 } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { Button, useMantineColorScheme } from '@mantine/core';
-import { IconSun, IconMoonStars, IconBrandGithub, IconWallet, IconBrandTwitter, IconKey } from '@tabler/icons';
+import { IconSun, IconMoonStars, IconCoin, IconWallet, IconBrandTwitter, IconKey } from '@tabler/icons';
 import { useState, useEffect } from 'react';
 import { Badge } from '@mantine/core';
 import LogoLight from '../../../assets/logo/logo-light.svg';

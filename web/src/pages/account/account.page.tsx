@@ -5,7 +5,7 @@ import useLinkStore from '@/store/link/link.store';
 import { formatEther, parseEther, parseUnits, ZeroAddress } from 'ethers';
 import { buildMintNFT, buildTransferToken, getTokenBalance, getTokenDecimals } from '@/logic/utils';
 import { useDisclosure } from '@mantine/hooks';
-import { IconCheck, IconChevronDown, IconCoin, IconCopy, IconFingerprint, IconPhoto, IconShieldCheck, IconUserCheck, IconX } from '@tabler/icons';
+import { IconCheck, IconChevronDown, IconCoin, IconCopy, IconFingerprint, IconPhoto, IconReload, IconShieldCheck, IconUserCheck, IconX } from '@tabler/icons';
 import { NetworkUtil } from '@/logic/networks';
 import { getIconForId, getTokenInfo, getTokenList, tokenList } from '@/logic/tokens';
 import { getJsonRpcProvider } from '@/logic/web3';
@@ -13,10 +13,9 @@ import { getJsonRpcProvider } from '@/logic/web3';
 import { getSafePassNFTCount, isInstalled, safePassKeyNFT, sendTransaction } from '@/logic/module';
 import {  loadPasskey, removePasskey, storeAccountInfo, storePasskey } from '@/utils/storage';
 
-import Passkey from '../../assets/icons/passkey.svg';
 import PasskeyWhite from '../../assets/icons/passkey-white.svg';
 import PasskeyGreen from '../../assets/icons/passkey-green.svg';
-import SafePassKeyNFT from '../../assets/icons/SafePassKeyNFT.svg';
+import SafePassKeyNFT from '../../assets/icons/ZenGuardHHG.png';
 import NotFound from '../../assets/icons/not-found.jpg';
 
 
@@ -35,7 +34,7 @@ import { WebAuthnMode } from '@zerodev/passkey-validator';
 export const AccountPage = () => {
 
   
-  const { claimDetails, accountDetails, setAccountDetails, setConfirming, chainId, setChainId } = useLinkStore((state: any) => state);
+  const { accountDetails, setAccountDetails, setConfirming, chainId, setChainId } = useLinkStore((state: any) => state);
   const [ balance, setBalance ] = useState<any>(0);
   const [opened, { open, close }] = useDisclosure(!accountDetails.account);
   const [sendModal, setSendModal] = useState(false);
@@ -53,17 +52,21 @@ export const AccountPage = () => {
   const [ creating, setCreating ] = useState(false);
   const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
   const [value, setValue] = useState<string>("0x0000000000000000000000000000000000000000");
+  const [ tokensDetails, setTokensDetails ] = useState([]);
+  const [ tokensLoading, setTokensLoading ] = useState(true);
+  const [ reloading, setReloading ] = useState(false);
   const [walletProvider, setWalletProvider] = useState<any>();
 
   
 
+  const enabledChains = [8453]
   const availableTestChains = Object.keys(tokenList).filter(chainId => NetworkUtil.getNetworkById(
     Number(chainId)
   )?.type == 'testnet').map(
     (chainId: string) => 
     ({label: `${NetworkUtil.getNetworkById(Number(chainId))?.name}`, type: `${NetworkUtil.getNetworkById(
       Number(chainId)
-    )?.type}`, image: getIconForId(chainId), value: chainId }))
+    )?.type}`, image: getIconForId(chainId), value: chainId}))
 
     const availableMainnetChains = Object.keys(tokenList).filter(chainId => NetworkUtil.getNetworkById(
       Number(chainId)
@@ -71,11 +74,11 @@ export const AccountPage = () => {
       (chainId: string) => 
       ({label: `${NetworkUtil.getNetworkById(Number(chainId))?.name}`, type: `${NetworkUtil.getNetworkById(
         Number(chainId)
-      )?.type}`, image: getIconForId(chainId), value: chainId }))
+      )?.type}`, image: getIconForId(chainId), value: chainId,  enabled: enabledChains.includes(Number(chainId)) }))
   
   
   const mainnetOptions = availableMainnetChains.map((item: any) => (
-    <Combobox.Option value={item.value} key={item.value}>
+    <Combobox.Option value={item.value} key={item.value} disabled={!item.enabled}>
       <SelectOption {...item} />
     </Combobox.Option>
   ));
@@ -87,13 +90,14 @@ export const AccountPage = () => {
   ));
 
   const options = (<Combobox.Options>
+
           <Combobox.Group >
             {mainnetOptions}
           </Combobox.Group>
-
-          <Combobox.Group label="TESTNETS">
+          <Combobox.Group label="TESTNET">
           {testnetOptions}
           </Combobox.Group>
+
         </Combobox.Options>)
 
   const chainCombobox = useCombobox({
@@ -174,7 +178,7 @@ export const AccountPage = () => {
             parseAmount = 0n;
             toAddress = value;
         }
-    const result = await sendTransaction(chainId.toString(), toAddress, parseAmount, '0x', walletProvider!, accountDetails.account)
+    const result = await sendTransaction(chainId.toString(), toAddress, parseAmount, data as Hex, walletProvider!, accountDetails.account)
     if (!result)
     setSendSuccess(false);
     else {
@@ -221,6 +225,30 @@ export const AccountPage = () => {
 
 
 
+  useEffect(() => {
+    (async () => {
+
+          setTokensLoading(true)
+          setBalanceLoading(true);
+          const provider = await getJsonRpcProvider(chainId.toString());
+          setNftBalance(await getSafePassNFTCount(chainId, accountDetails.account))
+          if(value == ZeroAddress) {
+            setBalance(formatEther(await provider.getBalance(accountDetails.account)))
+            } else {
+            setBalance(await getTokenBalance(value, accountDetails.account , provider))
+            }
+          setBalanceLoading(false);
+
+          
+          const tokens = getTokenList(chainId).filter( (token: any) => token.value!= ZeroAddress)
+          for(let token = 0 ; token < tokens.length; token++) {       
+            tokens[token].balance = await getTokenBalance(tokens[token].value, accountDetails.account , provider)
+          }
+          setTokensDetails(tokens.filter( (token: any) => token.balance > 0 ))
+          setTokensLoading(false)
+    })();
+  }, [ accountDetails.account, chainId, value, sendLoader, sendSuccess, reloading]);
+
 
   useEffect(() => {
     (async () => {
@@ -239,31 +267,17 @@ export const AccountPage = () => {
           const account = accountClient.account.address
   
           setAccountDetails({ account: account, address: '', privateKey: '' })
-          setNftBalance(await getSafePassNFTCount(chainId, account))
           setAccountClient(accountClient)
-          setBalanceLoading(true);
-          const provider = await getJsonRpcProvider(chainId.toString());
-    
-          if(value == ZeroAddress) {
-            setBalance(formatEther(await provider.getBalance(account )))
-            } else {
-            setBalance(await getTokenBalance(value, claimDetails?.account?.address , provider))
-            }
-          setBalanceLoading(false);
         }
         catch(e) {
           console.log(e)
 
         }
       }
-  
-
-      
-
       window.addEventListener('resize', () => setDimensions({ width: window.innerWidth, height: window.innerHeight }));
       
     })();
-  }, [ walletProvider, chainId, sendSuccess, value, sendLoader]);
+  }, [ walletProvider, chainId ]);
 
 
   
@@ -450,7 +464,7 @@ export const AccountPage = () => {
                <Text fz="sm" c="dimmed">
                {shortenAddress( accountDetails.account ? accountDetails.account : ZeroAddress)}
                </Text>
-               <Button
+             <Button
         size="sm" 
         radius="md"
         color='red'
@@ -470,7 +484,7 @@ export const AccountPage = () => {
         }}
       >
       Logout
-      </Button>
+      </Button> 
         </Group> : 
              <Skeleton height={18} width={180} mt={6} radius="xl" />
           }
@@ -849,7 +863,7 @@ export const AccountPage = () => {
                                 onClick={() => chainCombobox.toggleDropdown()}
                               > 
                                 {`${NetworkUtil.getNetworkById(Number(chainId))?.name}`}
-                </Badge>
+                      </Badge>
                         </Combobox.Target>
 
                         <Combobox.Dropdown>
@@ -859,6 +873,11 @@ export const AccountPage = () => {
 
 
           <p className={classes.balance}>  { balanceLoading ? <Skeleton height={20} width={110} mt={6} radius="xl" /> : `${balance} ${getTokenInfo(chainId, ZeroAddress).label}` }   </p>
+
+          <Button variant="transparent" radius='xl' onClick={ () => setReloading(!reloading) }>
+          <IconReload size={'xl'} color='#7CC562'/>
+
+            </Button>
           
           
         </div>
@@ -878,6 +897,54 @@ export const AccountPage = () => {
                 leftSection={<IconTransfer size={25} />}
                 >Send</Button>
           </div>
+
+          { tokensLoading &&  
+          
+          <Paper radius="md" withBorder className={classes.card} mt={20}>      
+          <Text ta="center" fw={700} className={classes.title}>
+            Your Tokens
+          </Text>
+    
+          <>
+          <Divider my="sm" />
+          <Group justify="space-between" mt="xs">
+            <Group >
+            <Skeleton height={25} width={25} mt={6} radius="xl" />
+            <Skeleton height={20} width={60} mt={6} radius="md" />
+            </Group>
+            <Skeleton height={20} width={30} mt={6} radius="md" />
+
+          </Group>
+          </>
+           
+    
+        </Paper> }
+
+          { !tokensLoading && tokensDetails.length > 0 && 
+          
+      <Paper radius="md" withBorder className={classes.card} mt={20}>      
+      <Text ta="center" fw={700} className={classes.title}>
+        Your Tokens
+      </Text>
+
+      { tokensDetails.map( (token: any) => <>
+      <Divider my="sm" />
+      <Group justify="space-between" mt="xs">
+        <Group >
+        <Avatar src={getTokenInfo(chainId, token.value)?.image} size='sm' >
+        </Avatar>
+        <Text fz="sm" c="dimmed">
+        { getTokenInfo(chainId, token.value)?.label } 
+        </Text>
+        </Group>
+        <Badge  variant="light" color="teal" size="lg">
+        { token.balance } 
+        </Badge>
+      </Group>
+      </>) 
+       }
+
+    </Paper> }
         </div>
       </div>
     </Paper>
